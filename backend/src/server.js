@@ -28,15 +28,37 @@ connectDB();
 app.use(helmet());
 
 // CORS configuration
-// CORS Configuration
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? [process.env.CLIENT_URL, 'https://*.vercel.app']
+  : [
+      'http://localhost:3000', 
+      'http://localhost:5173', 
+      'http://localhost:5174',
+      'http://localhost:5175',
+      'http://localhost:5176'
+    ];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000', 
-    'http://localhost:5173', 
-    'http://localhost:5174',
-    'http://localhost:5175',
-    'http://localhost:5176'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (process.env.NODE_ENV === 'production') {
+      // In production, check against CLIENT_URL and vercel domains
+      if (origin === process.env.CLIENT_URL || origin.includes('.vercel.app')) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'));
+      }
+    } else {
+      // In development, allow localhost origins
+      if (allowedOrigins.some(allowed => origin.includes('localhost'))) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'));
+      }
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
