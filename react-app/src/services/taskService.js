@@ -1,6 +1,7 @@
 import { getAuthToken } from '../contexts/AuthContext';
+import config from '../config/config';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = config.apiUrl;
 
 // Create axios-like request function with auth headers
 const request = async (endpoint, options = {}) => {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
+import config from '../../config/config';
 import { 
   Shield, 
   Users, 
@@ -55,7 +56,7 @@ const AdminPanelNew = () => {
       const token = localStorage.getItem('taskManagerToken');
       console.log('Fetching dashboard stats with token:', token ? 'Token exists' : 'No token');
       
-      const response = await fetch('http://localhost:5000/api/admin/stats', {
+      const response = await fetch(`${config.apiUrl.replace('/api', '')}/api/admin/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -82,7 +83,7 @@ const AdminPanelNew = () => {
       const token = localStorage.getItem('taskManagerToken');
       console.log('Fetching users with token:', token ? 'Token exists' : 'No token');
       
-      const response = await fetch('http://localhost:5000/api/admin/users', {
+      const response = await fetch(`${config.apiUrl.replace('/api', '')}/api/admin/users`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -108,7 +109,7 @@ const AdminPanelNew = () => {
   const fetchUserTasks = async (userId) => {
     try {
       const token = localStorage.getItem('taskManagerToken');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}/tasks`, {
+      const response = await fetch(`${config.apiUrl.replace('/api', '')}/api/admin/users/${userId}/tasks`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -127,7 +128,7 @@ const AdminPanelNew = () => {
   const fetchUserLoginHistory = async (userId) => {
     try {
       const token = localStorage.getItem('taskManagerToken');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}/login-history`, {
+      const response = await fetch(`${config.apiUrl.replace('/api', '')}/api/admin/users/${userId}/login-history`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -146,7 +147,7 @@ const AdminPanelNew = () => {
   const fetchLoginAttempts = async () => {
     try {
       const token = localStorage.getItem('taskManagerToken');
-      const response = await fetch('http://localhost:5000/api/admin/login-attempts', {
+      const response = await fetch(`${config.apiUrl.replace('/api', '')}/api/admin/login-attempts`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

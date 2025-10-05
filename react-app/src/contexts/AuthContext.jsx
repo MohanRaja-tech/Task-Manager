@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { signInWithGoogle } from '../config/firebase';
+import config from '../config/config';
 
 const AuthContext = createContext();
 
 // Backend API configuration
-const API_BASE_URL = 'http://localhost:5000/api/auth';
+const API_BASE_URL = config.authUrl;
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
