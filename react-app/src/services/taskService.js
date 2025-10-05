@@ -5,6 +5,8 @@ const API_BASE_URL = 'http://localhost:5000/api';
 // Create axios-like request function with auth headers
 const request = async (endpoint, options = {}) => {
   const token = getAuthToken();
+  console.log(`Making ${options.method || 'GET'} request to: ${API_BASE_URL}${endpoint}`);
+  console.log('Auth token present:', !!token);
   
   const config = {
     method: options.method || 'GET',
@@ -18,16 +20,20 @@ const request = async (endpoint, options = {}) => {
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    console.log(`Response status: ${response.status} for ${endpoint}`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      console.error(`API Error for ${endpoint}:`, errorData);
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 
     // Handle empty responses
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
-      return await response.json();
+      const data = await response.json();
+      console.log(`API Success for ${endpoint}:`, data);
+      return data;
     }
     
     return { success: true };
@@ -170,6 +176,20 @@ export const taskService = {
   // Get tasks with pagination
   async getTasksPaginated(page = 1, limit = 10) {
     return await this.getTasks({ page, limit });
+  },
+
+  // Start task timer
+  async startTaskTimer(taskId) {
+    return await request(`/tasks/${taskId}/start`, {
+      method: 'PATCH',
+    });
+  },
+
+  // Stop task timer
+  async stopTaskTimer(taskId) {
+    return await request(`/tasks/${taskId}/stop`, {
+      method: 'PATCH',
+    });
   }
 };
 
@@ -192,7 +212,9 @@ export const {
   getOverdueTasks,
   getTasksDueToday,
   searchTasks,
-  getTasksPaginated
+  getTasksPaginated,
+  startTaskTimer,
+  stopTaskTimer
 } = taskService;
 
 export default taskService;

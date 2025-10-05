@@ -62,8 +62,12 @@ const Login = () => {
       const result = await login(formData.email, formData.password);
       
       if (result.success) {
-        // Navigate to dashboard for all users (personalized based on user data)
-        navigate('/dashboard');
+        // Check if user is admin and redirect accordingly
+        if (result.user && result.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setErrors({ submit: result.error });
       }
@@ -83,8 +87,13 @@ const Login = () => {
       const result = await signinWithGoogle();
       
       if (result.success) {
-        console.log('Login component: Google sign in successful, navigating to dashboard...');
-        navigate('/dashboard');
+        console.log('Login component: Google sign in successful, checking user role...');
+        // Check if user is admin and redirect accordingly
+        if (result.user && result.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         console.log('Login component: Google sign in failed:', result.error);
         setErrors({ submit: result.error });

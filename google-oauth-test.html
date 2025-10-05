@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google OAuth Test</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+</head>
+<body>
+    <h1>Google OAuth Test</h1>
+    <button onclick="testGoogleAuth()">Test Google Sign-In</button>
+    <div id="result"></div>
+    
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMKQKir9Z5BhY-MFBz1ji1hdbS-7oZC8o",
+            authDomain: "taskmanager-c1c1c.firebaseapp.com",
+            projectId: "taskmanager-c1c1c",
+            storageBucket: "taskmanager-c1c1c.firebasestorage.app",
+            messagingSenderId: "946600821552",
+            appId: "1:946600821552:web:d61fdc82cba3855af8bef5",
+            measurementId: "G-B8MP77DW84"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        window.testGoogleAuth = async function() {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                const token = await user.getIdToken();
+                
+                document.getElementById('result').innerHTML = `
+                    <h3>Success!</h3>
+                    <p>User: ${user.email}</p>
+                    <p>Token Length: ${token.length}</p>
+                    <p>Testing backend...</p>
+                `;
+                
+                // Test backend
+                const response = await fetch('http://localhost:5001/api/auth/google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ idToken: token }),
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('result').innerHTML += `
+                    <h3>Backend Result:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <h3>Error:</h3>
+                    <p style="color: red;">${error.message}</p>
+                    <p>Code: ${error.code}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,10 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { Calendar, User, Edit3, Trash2, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import TaskTimer from './TaskTimer';
 import './TaskList.css';
 
-const TaskList = ({ tasks, onStatusChange, onEditTask, onDeleteTask }) => {
+const TaskList = ({ tasks, onStatusChange, onEditTask, onDeleteTask, onTaskUpdate }) => {
+  const [localTasks, setLocalTasks] = useState(tasks);
+
+  // Update local tasks when props change
+  React.useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
+
+  // Handle task updates from timer
+  const handleTaskUpdate = (updatedTask) => {
+    setLocalTasks(prevTasks => 
+      prevTasks.map(task => 
+        (task._id || task.id) === (updatedTask._id || updatedTask.id) 
+          ? updatedTask 
+          : task
+      )
+    );
+    
+    // Notify parent component if callback provided
+    if (onTaskUpdate) {
+      onTaskUpdate(updatedTask);
+    }
+  };
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed':
@@ -63,7 +86,7 @@ const TaskList = ({ tasks, onStatusChange, onEditTask, onDeleteTask }) => {
     return due <= threeDaysFromNow && due >= today;
   };
 
-  if (tasks.length === 0) {
+  if (localTasks.length === 0) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -92,15 +115,15 @@ const TaskList = ({ tasks, onStatusChange, onEditTask, onDeleteTask }) => {
     >
       <div className="task-list-header">
         <h2 className="task-list-title">
-          Tasks ({tasks.length})
+          Tasks ({localTasks.length})
         </h2>
         <div className="task-count">
-          Showing {tasks.length} task{tasks.length !== 1 ? 's' : ''}
+          Showing {localTasks.length} task{localTasks.length !== 1 ? 's' : ''}
         </div>
       </div>
 
       <div className="task-list">
-        {tasks.map((task, index) => (
+        {localTasks.map((task, index) => (
           <motion.div
             key={task.id}
             initial={{ opacity: 0, y: 20 }}
@@ -190,14 +213,25 @@ const TaskList = ({ tasks, onStatusChange, onEditTask, onDeleteTask }) => {
                 {/* Assignee */}
                 <div className="task-detail-item">
                   <User className="h-4 w-4 task-detail-icon" />
-                  <span className="task-detail-text">Assigned to: <span className="task-detail-value">{task.assignee}</span></span>
+                  <span className="task-detail-text">
+                    Assigned to: <span className="task-detail-value">{task.assignee || 'Unassigned'}</span>
+                  </span>
                 </div>
 
                 {/* Created Date */}
                 <div className="task-detail-item">
-                  <Clock className="h-4 w-4 task-detail-icon" />                  <span className="task-detail-text">Created: <span className="task-detail-value">{format(new Date(task.createdAt), 'MMM dd, yyyy')}</span></span>
+                  <Clock className="h-4 w-4 task-detail-icon" />
+                  <span className="task-detail-text">Created: <span className="task-detail-value">{format(new Date(task.createdAt), 'MMM dd, yyyy')}</span></span>
                 </div>
               </div>
+
+              {/* Task Timer - Show only for in-progress or completed tasks */}
+              {(task.status === 'in-progress' || task.status === 'completed' || task.timeSpent > 0) && (
+                <TaskTimer 
+                  task={task} 
+                  onTaskUpdate={handleTaskUpdate}
+                />
+              )}
 
               {/* Status Change Buttons */}
               <div className="task-footer">
@@ -221,7 +255,16 @@ const TaskList = ({ tasks, onStatusChange, onEditTask, onDeleteTask }) => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => onStatusChange(task._id || task.id, 'in-progress')}
+                      onClick={async () => {
+                        // Change status to in-progress
+                        await onStatusChange(task._id || task.id, 'in-progress');
+                        
+                        // Update local task to show timer
+                        handleTaskUpdate({
+                          ...task,
+                          status: 'in-progress'
+                        });
+                      }}
                       className="status-btn in-progress"
                     >
                       Start Progress

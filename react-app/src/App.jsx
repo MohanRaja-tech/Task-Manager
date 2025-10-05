@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/Auth/Login';
 import SignUp from './components/Auth/SignUp';
 import Dashboard from './components/Dashboard/Dashboard';
-import AdminPanel from './components/Admin/AdminPanel';
+import AdminPanelNew from './components/Admin/AdminPanel_new';
 import './App.css';
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+            <Route path="/admin" element={<AdminRoute><AdminPanelNew /></AdminRoute>} />
             <Route path="/" element={<Navigate to="/login" />} />
             
           </Routes>

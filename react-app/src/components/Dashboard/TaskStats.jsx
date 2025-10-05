@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Clock, AlertTriangle, Calendar, TrendingUp, Users } from 'lucide-react';
+import OverdueReviewPopup from './OverdueReviewPopup';
 import './TaskStats.css';
 
 const TaskStats = ({ tasks }) => {
+  const [showOverduePopup, setShowOverduePopup] = useState(false);
+
+  const handleReviewClick = () => {
+    setShowOverduePopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowOverduePopup(false);
+  };
+
   const stats = {
     total: tasks.length,
     completed: tasks.filter(task => task.status === 'completed').length,
@@ -193,7 +204,10 @@ const TaskStats = ({ tasks }) => {
                     {stats.overdue} overdue task{stats.overdue !== 1 ? 's' : ''}
                   </span>
                 </div>
-                <button className="action-button overdue">
+                <button 
+                  className="action-button overdue"
+                  onClick={handleReviewClick}
+                >
                   Review
                 </button>
               </div>
@@ -226,6 +240,13 @@ const TaskStats = ({ tasks }) => {
           </div>
         </motion.div>
       </div>
+
+      {/* Overdue Review Popup */}
+      <OverdueReviewPopup 
+        isOpen={showOverduePopup} 
+        onClose={handleClosePopup} 
+        tasks={tasks}
+      />
     </div>
   );
 };

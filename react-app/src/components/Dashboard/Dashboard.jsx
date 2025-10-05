@@ -167,6 +167,15 @@ const Dashboard = () => {
     setEditingTask(null);
   };
 
+  // Handle task updates from timer or other components
+  const handleTaskUpdate = (updatedTask) => {
+    setTasks(prev => prev.map(task => 
+      (task._id || task.id) === (updatedTask._id || updatedTask.id) 
+        ? updatedTask 
+        : task
+    ));
+  };
+
   // Filter tasks based on current filters
   const filteredTasks = tasks.filter(task => {
     if (filters.status !== 'all' && task.status !== filters.status) return false;
@@ -250,6 +259,7 @@ const Dashboard = () => {
                 onStatusChange={handleStatusChange}
                 onEditTask={handleEditTask}
                 onDeleteTask={handleDeleteTask}
+                onTaskUpdate={handleTaskUpdate}
               />
             </div>
 

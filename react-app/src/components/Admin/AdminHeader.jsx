@@ -39,26 +39,6 @@ const AdminHeader = () => {
 
           {/* Navigation and Actions */}
           <div className="admin-nav-actions">
-            {/* Back to Dashboard */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={goToDashboard}
-              className="back-to-dashboard"
-            >
-              <ArrowLeft className="back-icon" />
-              <span className="back-text">Back to Dashboard</span>
-            </motion.button>
-
-            {/* Settings Button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="settings-button"
-            >
-              <Settings className="settings-icon" />
-            </motion.button>
-
             {/* User Menu */}
             <div className="user-menu-container">
               <motion.button
@@ -67,10 +47,10 @@ const AdminHeader = () => {
                 className={`user-menu-trigger ${showUserMenu ? 'open' : ''}`}
               >
                 <div className="user-avatar">
-                  {user?.name?.charAt(0)?.toUpperCase()}
+                  <Shield size={20} />
                 </div>
                 <div className="user-info">
-                  <p className="user-name">{user?.name}</p>
+                  <p className="user-name">Admin</p>
                   <p className="user-role">Administrator</p>
                 </div>
               </motion.button>
